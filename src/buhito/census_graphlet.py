@@ -137,7 +137,7 @@ def _count(adj,
        reject_probability = None,
        return_distribution = False, 
        blacklist = set({}),
-       grpahlet_roots = None,
+       graphlet_roots = None,
        **kwargs):
     """ 
     adj                 : dict_of_dicts - the graph adjcencies
@@ -153,7 +153,7 @@ def _count(adj,
     state = {}
     state[l] = {}
     if not graphlet_roots: # include all nodes
-        grpahlet_roots = [x for x in adj]
+        graphlet_roots = [x for x in adj]
     state[l]['neighbors'] = graphlet_roots
     state[l]['blacklist'] = blacklist
     tree = []
@@ -250,6 +250,7 @@ def take_census(graph,
         from multiprocessing import Pool, cpu_count
         counter = Counter()
         results = []
+        blacklist = set({})
         with Pool(cpu_count() - 1) as workers:
             for node in adj:
                 kw = kwargs.copy()

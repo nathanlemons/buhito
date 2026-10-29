@@ -13,7 +13,7 @@ def test_petersen_graph():
     assert set({(len(info), number) for info, number in graphlets.items()}) == set({ (9, 10), (3, 30), (6, 15), (7, 20), (6, 10), (8, 15), (7, 30), (5, 60), (8, 30), (4, 10), (6, 60), (4, 60), (1, 10), (7, 60), (5, 12), (2, 15) })  
 
     # count only some graphlets
-    graphlets = take_census(g, subtree_starts = [0])
+    graphlets = take_census(g, graphlet_roots = [0])
     assert Counter({frozenset({(0, frozenset({1})), (1, frozenset({0}))}): 3}) == graphlets
     
         # with a vertex coloring
