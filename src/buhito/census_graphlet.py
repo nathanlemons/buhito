@@ -141,7 +141,7 @@ def _count(adj,
        **kwargs):
     """ 
     adj                 : dict_of_dicts - the graph adjcencies
-    graphlet_sizes      : positive int or list of positive ints
+    graphlet_sizes      : list of positive ints
     reject_probability  : rejection sampling with probability or full count
     return_distribution : return distribution of graphlets per size (defualt) otherwise counts of graphlets
     blacklist           : list of nodes to ignore
@@ -207,12 +207,27 @@ def take_census(graph,
                 edge_coloring = None,
                 reject_probability = None,
                 return_distribution = True, 
-                blacklist = set({}),
                 graphlet_roots = None,
                 use_pool = False,
                 save = None,
                 ):
     """
+    Enumerate graphlets from a graph.
+    
+    Inputs:
+        graph           : nx.Graph object or adjacency information as dictionary of dictionaries 
+        graphlet_sizes  : list of sizes of desired graphlets (eg all graphlets on 3 and 4 nodes)
+        vertex_coloring : dictionary mapping nodes to labels or attribute name to use as node labels
+                            from nx.Graph object.  Defualt is empty dictionary.
+        edge_coloring   : dictionary mapping edges to labels (ie frozenset({u,v}) -> edge_uv_label)
+                            or attribute name to use as edge labels from nx.Graph object.
+        reject_probability : float between 0 and 1.  A graphlet on $k$ vertices will be skipped 
+                            with probability 1-(1-p)^k.
+        return_distribution : Defaults to False.  If True, Instead of counts return counts normalized
+                            by total number of graphlets found of respective size.
+        graphlet_roots  : list of nodes. only return graphlets containing at least one of these nodes.
+        use_pool        : import multiprocessing.Pool to speed up graphlet counts.
+        save            : If not None, save counts to file "save.counter"
     """
     if type(graph) == nx.Graph:
         adj = nx.to_dict_of_dicts(graph)
@@ -229,7 +244,7 @@ def take_census(graph,
                 "vertex_coloring" : vertex_coloring,
                 "edge_coloring" : edge_coloring,
                 "reject_probability" : reject_probability,
-                "blacklist" : blacklist,
+                "blacklist" : set({}),
                 "graphlet_roots" : graphlet_roots,
                 }
     if use_pool:
@@ -247,16 +262,12 @@ def take_census(graph,
             workers.join()
             for r in results:
                 counter.update( r.get() )
-        if save:
-            with open(save + ".counter", "w") as myfile:
-                print(counter, file = myfile)
-        return counter
     else:
         counter = _simple_census(kwargs)
-        if save:
-            with open(save + ".counter", "w") as myfile:
-                print(counter, file = myfile)
-        return counter
+    if save:
+        with open(save + ".counter", "w") as myfile:
+            print(counter, file = myfile)
+    return counter
 
 
 if __name__ == '__main__':
