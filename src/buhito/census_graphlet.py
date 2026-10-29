@@ -137,7 +137,7 @@ def _count(adj,
        reject_probability = None,
        return_distribution = True, 
        blacklist = set({}),
-       subtree_starts = None,
+       grpahlet_roots = None,
        **kwargs):
     """ 
     adj                 : dict_of_dicts - the graph adjcencies
@@ -145,16 +145,16 @@ def _count(adj,
     reject_probability  : rejection sampling with probability or full count
     return_distribution : return distribution of graphlets per size (defualt) otherwise counts of graphlets
     blacklist           : list of nodes to ignore
-    subtree_starts      : only include graphlets with at least one of these nodes
+    graphlet_roots      : only include graphlets with at least one of these nodes
     """ 
     # initialize state
     max_size = max(graphlet_sizes)
     l = 0
     state = {}
     state[l] = {}
-    if not subtree_starts: # include all nodes
-        subtree_starts = [x for x in adj]
-    state[l]['neighbors'] = subtree_starts
+    if not graphlet_roots: # include all nodes
+        grpahlet_roots = [x for x in adj]
+    state[l]['neighbors'] = graphlet_roots
     state[l]['blacklist'] = blacklist
     tree = []
     remove = None
@@ -208,7 +208,7 @@ def take_census(graph,
                 reject_probability = None,
                 return_distribution = True, 
                 blacklist = set({}),
-                subtree_starts = None,
+                graphlet_roots = None,
                 use_pool = False,
                 save = None,
                 ):
@@ -230,7 +230,7 @@ def take_census(graph,
                 "edge_coloring" : edge_coloring,
                 "reject_probability" : reject_probability,
                 "blacklist" : blacklist,
-                "subtree_starts" : subtree_starts,
+                "graphlet_roots" : graphlet_roots,
                 }
     if use_pool:
         from multiprocessing import Pool, cpu_count
@@ -239,7 +239,7 @@ def take_census(graph,
         with Pool(cpu_count() - 1) as workers:
             for node in adj:
                 kw = kwargs.copy()
-                kw["subtree_starts"] = set({node})
+                kw["graphlet_roots"] = set({node})
                 kw["blacklist"] = blacklist.copy()
                 blacklist.add(node)
                 results.append(workers.apply_async(_simple_census,  [kw] ))
